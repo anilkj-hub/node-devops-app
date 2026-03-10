@@ -2,63 +2,42 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "node-devops-app"
-        CONTAINER_NAME = "node-container"
+        IMAGE = "anilkumarjena22/node-devops-app"
+        EC2_IP = "13.60.76.252"
+        KEY = "C:/node-devops-key.pem"
     }
 
     stages {
 
-        stage('Install Dependencies') {
+        stage('Checkout Code') {
             steps {
-                bat 'npm install'
-            }
-        }
-
-        stage('Build Application') {
-            steps {
-                bat 'echo Building application...'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                bat 'echo Running tests...'
-            }
-        }
-
-        stage('QA Check') {
-            steps {
-                bat 'echo Performing QA checks...'
+                git 'https://github.com/anilkj-hub/node-devops-app.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME% .'
+                bat 'docker build -t %IMAGE% .'
             }
         }
 
-        stage('Stop Old Container') {
+        stage('Push to Docker Hub') {
             steps {
-                bat 'docker stop %CONTAINER_NAME%'
-                bat 'docker rm %CONTAINER_NAME%'
+                bat 'docker push %IMAGE%'
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy to EC2') {
             steps {
-                bat 'docker run -d -p 3000:3000 --name %CONTAINER_NAME% %IMAGE_NAME%'
+                bat """
+                ssh -o StrictHostKeyChecking=no -i %KEY% ubuntu@%EC2_IP% ^
+                "docker pull %IMAGE% && \
+                docker stop node-container || true && \
+                docker rm node-container || true && \
+                docker run -d -p 3000:3000 --name node-container %IMAGE%"
+                """
             }
         }
 
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
     }
 }
