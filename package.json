@@ -1,0 +1,19 @@
+{
+  "name": "node-devops-app",
+  "version": "1.0.0",
+  "description": "Simple Express app for CI/CD pipeline testing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "devops",
+    "cicd",
+    "express"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
