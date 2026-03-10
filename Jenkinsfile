@@ -8,52 +8,46 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/anilkj-hub/node-devops-app.git'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Build Application') {
             steps {
-                sh 'echo Building application...'
+                bat 'echo Building application...'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'echo Running tests...'
+                bat 'echo Running tests...'
             }
         }
 
         stage('QA Check') {
             steps {
-                sh 'echo Performing QA checks...'
+                bat 'echo Performing QA checks...'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
         }
 
         stage('Stop Old Container') {
             steps {
-                sh 'docker stop $CONTAINER_NAME || true'
-                sh 'docker rm $CONTAINER_NAME || true'
+                bat 'docker stop %CONTAINER_NAME%'
+                bat 'docker rm %CONTAINER_NAME%'
             }
         }
 
         stage('Deploy Container') {
             steps {
-                sh 'docker run -d -p 3000:3000 --name $CONTAINER_NAME $IMAGE_NAME'
+                bat 'docker run -d -p 3000:3000 --name %CONTAINER_NAME% %IMAGE_NAME%'
             }
         }
 
